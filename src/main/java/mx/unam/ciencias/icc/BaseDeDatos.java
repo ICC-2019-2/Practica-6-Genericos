@@ -27,7 +27,7 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * Constructor único.
      */
     public BaseDeDatos() {
-        // Aquí va su código.
+        this.registros=new Lista<R>();
     }
 
     /**
@@ -35,7 +35,7 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * @return el número de registros en la base de datos.
      */
     public int getNumRegistros() {
-        // Aquí va su código.
+        return registros.getLongitud();
     }
 
     /**
@@ -44,7 +44,7 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * @return una lista con los registros en la base de datos.
      */
     public Lista<R> getRegistros() {
-        // Aquí va su código.
+        return registros.copia();
     }
 
     /**
@@ -52,7 +52,7 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * @param registro el registro que hay que agregar a la base de datos.
      */
     public void agregaRegistro(R registro) {
-        // Aquí va su código.
+        registros.agregaFinal(registro);
     }
 
     /**
@@ -60,14 +60,15 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * @param registro el registro que hay que eliminar de la base de datos.
      */
     public void eliminaRegistro(R registro) {
-        // Aquí va su código.
+        registros.elimina(registro);
     }
 
     /**
      * Limpia la base de datos.
      */
     public void limpia() {
-        // Aquí va su código.
+        registros.limpia();
+        
     }
 
     /**
@@ -76,7 +77,12 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * @throws IOException si ocurre un error de entrada/salida.
      */
     public void guarda(BufferedWriter out) throws IOException {
-        // Aquí va su código.
+        Lista<R>.Nodo n = registros.getCabeza();
+        while(n != null){
+          Registro r =n.get();
+          r.guarda(out);
+          n= n.getSiguiente();
+        }
     }
 
     /**
@@ -87,7 +93,12 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      * @throws IOException si ocurre un error de entrada/salida.
      */
     public void carga(BufferedReader in) throws IOException {
-        // Aquí va su código.
+        registros.limpia();
+        R r =creaRegistro();
+        while (r.carga(in)){
+          agregaRegistro(r);
+          r=creaRegistro();
+        }
     }
 
     /**
@@ -100,7 +111,17 @@ public abstract class BaseDeDatos<R extends Registro<C>, C extends Enum> {
      *         correcta.
      */
     public Lista<R> buscaRegistros(C campo, Object valor) {
-        // Aquí va su código.
+        if (!(campo instanceof CampoEstudiante))
+            throw new IllegalArgumentException();
+        Lista<R> l = new Lista<R>();
+        Lista<R>.Nodo n= registros.getCabeza();
+        while (n != null){
+          R r= n.get();
+          if(r.caza(campo,valor))
+          l.agregaFinal(r);
+          n=n.getSiguiente();
+        }
+        return l;
     }
 
     /**
